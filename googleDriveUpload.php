@@ -5,8 +5,8 @@ include_once 'gmail/src/contrib/Google_Oauth2Service.php';
 require_once 'gmail/src/contrib/Google_DriveService.php';
 
 $client = new Google_Client();
-$client->setClientId('294766078257-uct39genvd5trbn9jej4b3233hp0mq2v.apps.googleusercontent.com');
-$client->setClientSecret('JKvVXcwRsYagzE32AogtHJh8');
+$client->setClientId('{clientId}');
+$client->setClientSecret('ClientSecretID');
 $client->setRedirectUri('https://mayurbmalaviya.000webhostapp.com/Facebook_App/googleDriveUpload.php');
 $client->setScopes(array('https://www.googleapis.com/auth/drive.file'));
 
