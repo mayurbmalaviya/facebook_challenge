@@ -36,6 +36,7 @@ catch(Facebook\Exceptions\FacebookRSDKException $e){
 
 $albums = $responseAlbums->getGraphUser();
 if(!isset( $_SESSION['Albums'] ) ){
+    ob_start();
 	$_SESSION['Albums'] =$albums;
 }
 
@@ -54,9 +55,6 @@ $mainDirectory='';
 
 		//echo $mainDirectory;
 	
-		if (!is_dir($mainDirectory)) {
-			//mkdir($mainDirectory,0777,true);
-		}
 		if(isset($_REQUEST['images']))
 		{
 			//it will take individual selected albums
@@ -91,20 +89,18 @@ $mainDirectory='';
 					$counter++;
 				}
 			}
-		}
+			$zipfilename=createZipFile($mainDirectory);
 		
-		$zipfilename=createZipFile($mainDirectory);
-		
-		$_SESSION["zipfName"] = $zipfilename;
-		deleteDir($path);
-		$filepath = $_SERVER['DOCUMENT_ROOT']."/Facebook_App/".$mainDirectory.".zip";
-	//    echo $filepath;
-		//file_put_contents("./", fopen($filepath, 'r'));
-		   /* echo "<div class='downloadlink'>click here for Download Album : <a  href=".$zipfilename.">Click Here to Download</a><br/>";*/
+			$_SESSION["zipfName"] = $zipfilename;
+			deleteDir($path);
+			$filepath = $_SERVER['DOCUMENT_ROOT']."/Facebook_App/".$mainDirectory.".zip";
+
 		    $_SESSION["drivefilename"] = $path.".zip"; 
 			$_SESSION['download_file']='done';
-			//header('location:profile.php');
-		  //  echo "Click here to upload on Google Drive : <a  href='googleDriveUpload.php'>Click here to upload!</a></div>";
+
+		}
+		
+				
 	}
 	
 	function album_page_data($albums_first_page,$albums_next_page_link)
@@ -139,7 +135,6 @@ $mainDirectory='';
 	}
 	function createZipFile($folderName)
 	{
-		//$folderName= "zipFolderDemo";
 		$filepath =  $_SERVER['DOCUMENT_ROOT']."/Facebook_App/".$folderName;
 		$rootPath = realpath($filepath);
 
@@ -218,8 +213,9 @@ $mainDirectory='';
         <meta name="viewport" content="width=device-width, initial-scale=1">
 	    <title>Facebook Album Downloader</title>
 		
-		<link rel="shortcut icon" href="assets/images/favicon.png" />
 		
+		<link rel="shortcut icon" href="assets/images/favicon.png" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 		<!-- Bootstrap -->
 		<link rel="stylesheet" type="text/css" href="assets/css/bootstrap.css">
 		<!-- fancybox css File -->
@@ -257,8 +253,11 @@ $mainDirectory='';
 			<div class="row">
 				<div class="col-md-12">
 					<div class="logo text-center">
-						<h2><a href="index.html">Facebok Album Downloader</a></h2>
+					   
+						<h2><a href="#"><?php echo $albums['name']?>'s Facebok Album Downloader</a></h2>
+						<a href="sessionDestroy.php">Logout</a>
 					</div>
+					
 				</div>
 			</div>
 		</div>
@@ -273,6 +272,7 @@ $mainDirectory='';
 			<input type="checkbox" id="selectsAllchk" name="selectsAllchk" onClick='selectAllcheckboxes(this)'/>
 			<span>Select all</span> &nbsp; &nbsp;
 			<span><input type="submit" id="btnDownload" name="btnDownload" value="Download_Albums" /></span>
+			
 		</div>
 		</div>
 	</div>
@@ -322,7 +322,10 @@ $mainDirectory='';
 								</a>
 								<div class="box-content">
 									<input type='checkbox' id="<?php $id;?>" name='images[]' value='<?php echo $id; ?>'/>
-									<span><?php echo $albums['albums'][$count]['name'];?></span>
+									<span><?php echo $albums['albums'][$count]['name'];?></span>&nbsp;&nbsp;&nbsp;
+									<span><i class="fa fa-download" style="font-size:18px;color:blue;" ></i></span>&nbsp;&nbsp;&nbsp;
+									<span><img src="images/google_drive.png" height="30px" width="30px"></i></a></span>
+	
 								</div>
 							</div>
 						</div>
