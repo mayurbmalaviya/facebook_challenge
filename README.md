@@ -2,7 +2,7 @@
 ##### Author &nbsp;&nbsp;&nbsp;: Mayurkumar Malaviya&nbsp;&lt;<mayurbmalaviya@gmail.com>&gt;
 ##### category : PHP
 ##### Since   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : 24-08-2018
-##### link    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : https://mayurbmalaviya.000webhostapp.com/Facebook_App/index.php
+##### link    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : https://bitscamp.com/Mayur/index.php
 
 # New Features!
 
@@ -19,7 +19,7 @@
   - GOOGLE AUTH 1.1
   
 # QUICK START
-    - visit https://mayurbmalaviya.000webhostapp.com/Facebook_App/index.php
+    - visit https://bitscamp.com/Mayur/index.php
     - user should login with facebook
     - Single,multiple or all album will be provided.
     - user can download album on server
