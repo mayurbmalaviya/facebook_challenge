@@ -1,56 +1,103 @@
 <?php
-@session_start();
-include_once 'gmail/src/Google_Client.php';
-include_once 'gmail/src/contrib/Google_Oauth2Service.php';
-require_once 'gmail/src/contrib/Google_DriveService.php';
-
-$client = new Google_Client();
-$client->setClientId('{clientId}');
-$client->setClientSecret('ClientSecretID');
-$client->setRedirectUri('https://mayurbmalaviya.000webhostapp.com/Facebook_App/googleDriveUpload.php');
-$client->setScopes(array('https://www.googleapis.com/auth/drive.file'));
-
-
-if (isset($_GET['code']) || (isset($_SESSION['access_token']))) {
+    include('lib/google/vendor/autoload.php');
+    include("config.php");
+    @session_start();
 	
-	
-	$service = new Google_DriveService($client);
-    if (isset($_GET['code'])) {
-		$client->authenticate($_GET['code']);
-		$_SESSION['access_token'] = $client->getAccessToken();		
-    } else
-        $client->setAccessToken($_SESSION['access_token']);
-	//var_dump($client);
-	
-	
-    //Insert a file
- 
-    //$fileName="facebook_SurajKumarSingh_albums.zip";
-    $fileName=$_SESSION["drivefilename"];
-	$file = new Google_DriveFile();
-    $file->setTitle($fileName);
-    $file->setMimeType('application/zip');
-    $file->setDescription('A User Details is uploading in zip format');
-	//print_r($file);
-    //exit;
-   
-    $createdFile = $service->files->insert($file, array(
-          'data' =>file_get_contents($fileName),
-          'mimeType' => 'application/zip',
-		  'uploadType'=>'multipart'
-        ));
-	if(file_exists($fileName)){
-    	unlink($fileName);
+	if(!isset($_SESSION['username']))
+	{
+		header("Location:index.php");
+		exit;
 	}
-	header("Location:profile.php");
-	exit;
-	//print_r($createdFile);
+	
+	if(isset($_REQUEST['arrayValue'])){
+		$chk_values = $_REQUEST['arrayValue'];
+		$chk_array = explode(" ", trim($chk_values));
+		$_SESSION['selectedAlbum'] = $chk_array ;
+	}
+	
+	$google_redirect_url = "https://bitscamp.com/Mayur/googleDriveUpload.php";
+	$client = new Google_Client();
+	
+	$client->setClientId('294766078257-uct39genvd5trbn9jej4b3233hp0mq2v.apps.googleusercontent.com');
+    $client->setClientSecret('JKvVXcwRsYagzE32AogtHJh8');
+	$client->setRedirectUri($google_redirect_url);
+	$client->addScope(Google_Service_Drive::DRIVE);
+    
+	function moveToDrive($drive,$root,$folder,$data)
+	{
+	    
+		$fileMetadata = new Google_Service_Drive_DriveFile(array(
+			'name' => $folder,
+			'mimeType' => 'application/vnd.google-apps.folder',
+			'parents' => array($root)
+		));
+		
+		$curFolder = $drive->files->create($fileMetadata, array('fields' => 'id'));
+		$curFolderId = $curFolder->id;
 
-} else {
-    $authUrl = $client->createAuthUrl();
-    header('Location:'.$authUrl);
-    //header("Location:profile.php");
-    exit();
-}
+        
+		foreach ($data[0] as $item) {
+			$url = $item['images'][0]['source'];
+			
+			//echo $url;
+			//exit;
+			
+			$fileMeta = new Google_Service_Drive_DriveFile(array(
+				'name' => uniqid().'.jpg',
+				'parents' => array($curFolderId)
+			));
+			
+			$content = file_get_contents($url);
+	
+			$file = $drive->files->create($fileMeta, array(
+				'data' => $content,
+				'mimeType' => 'image/jpeg',
+				'uploadType' => 'multipart',
+				'fields' => 'id'));
+		}
+	}
 
+
+	if (isset($_GET['code']) || (isset($_SESSION['access_token']))) 
+	{
+		$drive = new Google_Service_Drive($client);
+		
+		if (isset($_GET['code'])) {
+			$client->authenticate($_GET['code']);
+			$_SESSION['access_token'] = $client->getAccessToken();		
+		} else
+			$client->setAccessToken($_SESSION['access_token']);
+		
+		$rootName = 'facebook_'.str_replace(' ','',$_SESSION['username']).'_album';
+		$fileMetadata = new Google_Service_Drive_DriveFile(array(
+        'name' =>$rootName ,
+        'mimeType' => 'application/vnd.google-apps.folder'));
+		$rootDir = $drive->files->create($fileMetadata, array('fields' => 'id'));
+		$rooTfolderId = $rootDir->id;
+		
+		$albums = $_SESSION['images_of_all_albums'] ; 
+		$selectedAlbum = $_SESSION['selectedAlbum'];
+
+		foreach($albums as $key => $album)
+		{
+			$singleAlbumName = trim(' '.str_replace(' ','',$key));
+		    foreach($selectedAlbum as $selectedSingleAlbum)
+		    {
+				$selectedSingleAlbum = trim($selectedSingleAlbum);
+		        if(!strcmp($singleAlbumName,$selectedSingleAlbum))
+		        {
+					moveToDrive($drive,$rooTfolderId,$singleAlbumName,$album);
+					break;
+		        }
+		    }	    
+		}
+		
+		header("Location:profile.php");
+		exit;
+	} else {
+		$authUrl = $client->createAuthUrl();
+		header('Location:'.$authUrl);
+		exit();
+	}
+	
 ?>

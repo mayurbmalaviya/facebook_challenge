@@ -5,11 +5,12 @@
  * @category PHP
  * @author   Mayurkumar Malaviya <mayurbmalaviya@gmail.com>
  * @since    24-08-2018
- * @link     https://mayurbmalaviya.000webhostapp.com/Facebook_App/index.php
+ * @link     https://bitscamp.com/Mayur/index.php
  *
  * Here facebook login will be allow to users.
  *
  **/
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -48,10 +49,12 @@
 
 	<!-- Header Logo & Menu End -->	
 	<?php 
+    	ob_start();
 		include("config.php");
 		$helper = $fb->getRedirectLoginHelper();
 		$permissions = ['email','user_photos']; // Optional permissions
-		$loginUrl = $helper->getLoginUrl('https://mayurbmalaviya.000webhostapp.com/Facebook_App/album.php', $permissions);
+	    ob_clean();
+		$loginUrl = $helper->getLoginUrl('https://bitscamp.com/Mayur/album.php', $permissions);
 
 //echo '<a href="' . htmlspecialchars($loginUrl) . '">Log in with Facebook!</a>';
 ?>
